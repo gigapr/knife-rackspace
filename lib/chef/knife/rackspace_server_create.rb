@@ -207,44 +207,43 @@ class Chef
 	if config[:winrm_bootstrap]
 	   print "\nStarting bootstrap using Windows Remote Management"
 	   winrmCommand = "knife bootstrap windows winrm " + public_ip(server) + " -x Administrator -P '" + server.password + "' -r '" + config[:run_list].join(",") + "'"	 
-	   puts "\nExecuting winrm"
 	   puts winrmCommand
 	   system(winrmCommand)			
 	else
-           print "\n#{ui.color("Waiting for sshd", :magenta)}"
-           
-           #which IP address to bootstrap
-           bootstrap_ip_address = public_ip(server)
-           if config[:private_network]
-             bootstrap_ip_address = private_ip(server)
-           end
-           Chef::Log.debug("Bootstrap IP Address #{bootstrap_ip_address}")
-           if bootstrap_ip_address.nil?
-             ui.error("No IP address available for bootstrapping.")
-             exit 1
-           end
-                         
-           print(".") until tcp_test_ssh(bootstrap_ip_address) {
-             sleep @initial_sleep_delay ||= 10
-             puts("done")
-           }
-           bootstrap_for_node(server, bootstrap_ip_address).run
-                         
-           puts "\n"
-           msg_pair("Instance ID", server.id)
-           msg_pair("Host ID", server.host_id)
-           msg_pair("Name", server.name)
-           msg_pair("Flavor", server.flavor.name)
-           msg_pair("Image", server.image.name)
-           msg_pair("Metadata", server.metadata)
-           msg_pair("Public DNS Name", public_dns_name(server))
-           msg_pair("Public IP Address", public_ip(server))
-           msg_pair("Private IP Address", private_ip(server))
-           msg_pair("Password", server.password)
-           msg_pair("Environment", config[:environment] || '_default')
-           msg_pair("Run List", config[:run_list].join(', '))
-	end		             
-      end
+         print "\n#{ui.color("Waiting for sshd", :magenta)}"
+         
+         #which IP address to bootstrap
+         bootstrap_ip_address = public_ip(server)
+         if config[:private_network]
+           bootstrap_ip_address = private_ip(server)
+         end
+         Chef::Log.debug("Bootstrap IP Address #{bootstrap_ip_address}")
+         if bootstrap_ip_address.nil?
+           ui.error("No IP address available for bootstrapping.")
+           exit 1
+         end
+                       
+         print(".") until tcp_test_ssh(bootstrap_ip_address) {
+           sleep @initial_sleep_delay ||= 10
+           puts("done")
+         }
+         bootstrap_for_node(server, bootstrap_ip_address).run
+                       
+         puts "\n"
+         msg_pair("Instance ID", server.id)
+         msg_pair("Host ID", server.host_id)
+         msg_pair("Name", server.name)
+         msg_pair("Flavor", server.flavor.name)
+         msg_pair("Image", server.image.name)
+         msg_pair("Metadata", server.metadata)
+         msg_pair("Public DNS Name", public_dns_name(server))
+         msg_pair("Public IP Address", public_ip(server))
+         msg_pair("Private IP Address", private_ip(server))
+         msg_pair("Password", server.password)
+         msg_pair("Environment", config[:environment] || '_default')
+         msg_pair("Run List", config[:run_list].join(', '))
+	 end		             
+   end
 
       def bootstrap_for_node(server, bootstrap_ip_address)
         bootstrap = Chef::Knife::Bootstrap.new
